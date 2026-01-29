@@ -1,5 +1,5 @@
 import { initializeApp } from 'firebase/app';
-import { getAuth, GoogleAuthProvider, signInWithPopup, signInWithRedirect, getRedirectResult, signOut } from 'firebase/auth';
+import { getAuth, GoogleAuthProvider, signInWithPopup, signInWithRedirect, getRedirectResult, onAuthStateChanged, signOut } from 'firebase/auth';
 
 // Firebase configuration - Replace with your project's config
 const firebaseConfig = {
@@ -19,20 +19,11 @@ const googleProvider = new GoogleAuthProvider();
 // Check if we're in production (Vercel)
 const isProduction = import.meta.env.PROD;
 
-// Google Sign-in - Use redirect in production, popup in development
+// Google Sign-in - Use popup for both (redirect has issues)
 export const signInWithGoogle = async () => {
     try {
-        let result;
-        
-        if (isProduction) {
-            // Use redirect for production (avoids COOP issues)
-            await signInWithRedirect(auth, googleProvider);
-            // This won't return immediately - page will redirect
-            return null;
-        } else {
-            // Use popup for local development
-            result = await signInWithPopup(auth, googleProvider);
-        }
+        // Always use popup - it works better across environments
+        const result = await signInWithPopup(auth, googleProvider);
         
         const user = result.user;
         const idToken = await user.getIdToken();
@@ -52,7 +43,7 @@ export const signInWithGoogle = async () => {
     }
 };
 
-// Handle redirect result (call this on app init)
+// Handle redirect result (keep for backwards compatibility)
 export const handleRedirectResult = async () => {
     try {
         const result = await getRedirectResult(auth);
@@ -72,8 +63,31 @@ export const handleRedirectResult = async () => {
         return null;
     } catch (error) {
         console.error('Redirect result error:', error);
-        throw error;
+        return null;
     }
+};
+
+// Check if user is already signed in with Firebase
+export const getCurrentFirebaseUser = () => {
+    return new Promise((resolve) => {
+        const unsubscribe = onAuthStateChanged(auth, async (user) => {
+            unsubscribe();
+            if (user) {
+                const idToken = await user.getIdToken();
+                resolve({
+                    idToken,
+                    user: {
+                        email: user.email,
+                        name: user.displayName,
+                        photoURL: user.photoURL,
+                        uid: user.uid
+                    }
+                });
+            } else {
+                resolve(null);
+            }
+        });
+    });
 };
 
 // Sign out
