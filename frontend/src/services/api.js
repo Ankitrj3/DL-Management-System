@@ -1,7 +1,9 @@
 import axios from 'axios';
 
-// Use environment variable for API URL, fallback to same hostname for local dev
-const API_URL = import.meta.env.VITE_API_URL || `http://${window.location.hostname}:5001/api`;
+// Hardcoded API URL for production, fallback for local dev
+const API_URL = import.meta.env.PROD 
+    ? 'https://dl-management-system.onrender.com/api'
+    : `http://${window.location.hostname}:5001/api`;
 
 const api = axios.create({
     baseURL: API_URL,
