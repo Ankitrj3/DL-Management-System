@@ -1,7 +1,7 @@
 import axios from 'axios';
 
-// Use same hostname as current page for API
-const API_URL = `http://${window.location.hostname}:5001/api`;
+// Use environment variable for API URL, fallback to same hostname for local dev
+const API_URL = import.meta.env.VITE_API_URL || `http://${window.location.hostname}:5001/api`;
 
 const api = axios.create({
     baseURL: API_URL,
