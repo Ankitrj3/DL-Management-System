@@ -1,6 +1,6 @@
 import { createContext, useContext, useState, useEffect } from 'react';
 import { authService } from '../services/api';
-import { signInWithGoogle, firebaseSignOut } from '../config/firebase';
+import { signInWithGoogle, firebaseSignOut, handleRedirectResult } from '../config/firebase';
 
 const AuthContext = createContext(null);
 
@@ -13,6 +13,25 @@ export const AuthProvider = ({ children }) => {
         const initAuth = async () => {
             const storedToken = localStorage.getItem('token');
             const storedUser = localStorage.getItem('user');
+
+            // Check for redirect result (from Google OAuth redirect)
+            try {
+                const redirectResult = await handleRedirectResult();
+                if (redirectResult) {
+                    // User just came back from Google OAuth redirect
+                    const response = await authService.firebaseAuth(redirectResult.idToken);
+                    const { token: newToken, ...userData } = response.data;
+
+                    setToken(newToken);
+                    setUser(userData);
+                    localStorage.setItem('token', newToken);
+                    localStorage.setItem('user', JSON.stringify(userData));
+                    setLoading(false);
+                    return;
+                }
+            } catch (error) {
+                console.error('Redirect result error:', error);
+            }
 
             if (storedToken && storedUser) {
                 try {
@@ -35,7 +54,15 @@ export const AuthProvider = ({ children }) => {
     const loginWithGoogle = async () => {
         try {
             // Sign in with Google Firebase
-            const { idToken } = await signInWithGoogle();
+            const result = await signInWithGoogle();
+
+            // If using redirect (production), result will be null and page will redirect
+            if (!result) {
+                return null;
+            }
+
+            // If using popup (development), continue with auth
+            const { idToken } = result;
 
             // Authenticate with our backend
             const response = await authService.firebaseAuth(idToken);

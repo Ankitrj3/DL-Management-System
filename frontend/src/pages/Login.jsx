@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { LogIn, AlertCircle, ShieldCheck, User } from 'lucide-react';
@@ -6,8 +6,19 @@ import { LogIn, AlertCircle, ShieldCheck, User } from 'lucide-react';
 const Login = () => {
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState('');
-    const { loginWithGoogle } = useAuth();
+    const { loginWithGoogle, user, isAuthenticated } = useAuth();
     const navigate = useNavigate();
+
+    // Handle redirect after OAuth
+    useEffect(() => {
+        if (isAuthenticated && user) {
+            if (user.role === 'admin') {
+                navigate('/admin');
+            } else {
+                navigate('/dashboard');
+            }
+        }
+    }, [isAuthenticated, user, navigate]);
 
     const handleGoogleLogin = async (intendedRole) => {
         setLoading(true);
@@ -15,6 +26,13 @@ const Login = () => {
 
         try {
             const userData = await loginWithGoogle();
+
+            // If using redirect (production), userData will be null
+            // The redirect will happen and useEffect will handle navigation
+            if (!userData) {
+                // Keep loading state - page will redirect to Google
+                return;
+            }
 
             // Check if user has the permission for the role they intended
             // Although backend handles the actual role, this provides a better UX
