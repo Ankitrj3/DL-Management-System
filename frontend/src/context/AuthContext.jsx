@@ -8,6 +8,7 @@ export const AuthProvider = ({ children }) => {
     const [user, setUser] = useState(null);
     const [token, setToken] = useState(localStorage.getItem('token'));
     const [loading, setLoading] = useState(true);
+    const [redirectHandled, setRedirectHandled] = useState(false);
 
     useEffect(() => {
         const initAuth = async () => {
@@ -16,17 +17,26 @@ export const AuthProvider = ({ children }) => {
 
             // Check for redirect result (from Google OAuth redirect)
             try {
+                console.log('Checking for redirect result...');
                 const redirectResult = await handleRedirectResult();
                 if (redirectResult) {
+                    console.log('Redirect result found, authenticating with backend...');
                     // User just came back from Google OAuth redirect
                     const response = await authService.firebaseAuth(redirectResult.idToken);
                     const { token: newToken, ...userData } = response.data;
 
+                    console.log('Backend auth successful:', userData);
                     setToken(newToken);
                     setUser(userData);
                     localStorage.setItem('token', newToken);
                     localStorage.setItem('user', JSON.stringify(userData));
+                    setRedirectHandled(true);
                     setLoading(false);
+                    
+                    // Force navigation based on role
+                    const targetPath = userData.role === 'admin' ? '/admin' : '/dashboard';
+                    console.log('Navigating to:', targetPath);
+                    window.location.href = targetPath;
                     return;
                 }
             } catch (error) {
