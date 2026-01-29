@@ -4,8 +4,9 @@ const User = require('./models/User');
 
 // Admin emails (these will have admin access)
 const admins = [
-    { email: 'tech.smani@gmail.com', name: 'Tech Smani' },
-    { email: 'ankitrobinranjan@gmail.com', name: 'Ankit Ranjan' }
+    { email: 'tech.smani@gmail.com', name: 'Suraj Mani' },
+    { email: 'ankitrobinranjan@gmail.com', name: 'Ankit Ranjan' },
+    { email: 'shashi2043@gmail.com', name: 'Shashi Mani' }
 ];
 
 // Student emails (add your approved student emails here)
