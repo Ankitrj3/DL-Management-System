@@ -6,7 +6,8 @@ const userSchema = new mongoose.Schema({
     required: true,
     unique: true,
     lowercase: true,
-    trim: true
+    trim: true,
+    index: true
   },
   name: {
     type: String,
@@ -17,12 +18,14 @@ const userSchema = new mongoose.Schema({
   },
   firebaseUid: {
     type: String,
-    sparse: true
+    sparse: true,
+    index: true
   },
   role: {
     type: String,
     enum: ['student', 'admin'],
-    default: 'student'
+    default: 'student',
+    index: true
   },
   isApproved: {
     type: Boolean,
@@ -30,7 +33,8 @@ const userSchema = new mongoose.Schema({
   },
   isBlocked: {
     type: Boolean,
-    default: false
+    default: false,
+    index: true
   },
   lastLogin: {
     type: Date
@@ -38,5 +42,8 @@ const userSchema = new mongoose.Schema({
 }, {
   timestamps: true
 });
+
+// Compound index for common queries
+userSchema.index({ role: 1, isBlocked: 1 });
 
 module.exports = mongoose.model('User', userSchema);
