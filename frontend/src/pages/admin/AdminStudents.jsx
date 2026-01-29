@@ -123,9 +123,9 @@ const AdminStudents = () => {
 
     return (
         <div className="fade-in">
-            <div style={{ marginBottom: '32px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            <div style={{ marginBottom: '32px', display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '16px' }}>
                 <div>
-                    <h1 style={{ fontSize: '28px', fontWeight: '700', marginBottom: '8px', display: 'flex', alignItems: 'center', gap: '12px' }}>
+                    <h1 style={{ fontSize: '28px', fontWeight: '700', marginBottom: '8px', display: 'flex', alignItems: 'center', gap: '12px', flexWrap: 'wrap' }}>
                         Whitelist Management 
                         <Users size={28} style={{ color: 'var(--accent-primary)' }} />
                     </h1>
@@ -133,10 +133,10 @@ const AdminStudents = () => {
                         Control which students can access the system
                     </p>
                 </div>
-                <div style={{ display: 'flex', gap: '12px' }}>
+                <div style={{ display: 'flex', gap: '12px', flexWrap: 'wrap' }}>
                     <label className="btn btn-secondary" style={{ cursor: 'pointer' }}>
                         <Upload size={18} />
-                        {isUploading ? 'Uploading...' : 'Bulk CSV Upload'}
+                        <span className="btn-text">{isUploading ? 'Uploading...' : 'Bulk CSV Upload'}</span>
                         <input
                             type="file"
                             accept=".csv"
@@ -150,7 +150,7 @@ const AdminStudents = () => {
                         className="btn btn-primary"
                     >
                         <UserPlus size={18} />
-                        Add Single Student
+                        <span className="btn-text">Add Student</span>
                     </button>
                 </div>
             </div>

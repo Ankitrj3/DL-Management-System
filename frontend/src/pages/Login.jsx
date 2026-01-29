@@ -102,11 +102,12 @@ const Login = () => {
 
                 <div className="login-grid" style={{
                     display: 'grid',
-                    gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))',
+                    gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))',
                     gap: '24px',
                     width: '100%',
                     maxWidth: '900px',
-                    margin: '0 auto'
+                    margin: '0 auto',
+                    padding: '0 10px'
                 }}>
                     {/* Student Login Card */}
                     <div className="login-card fade-in">
